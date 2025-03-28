@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>15-618 Project Proposal: Parallel Simulation of Heat Diffusion</title>
+</head>
+<body>
+    <h1>15-618 Project Proposal: Parallel Simulation of Heat Diffusion</h1>
+    <p><strong>Group:</strong> Akshay Joshi (akshayjo) & Amogha Hegde (amoghah)</p>
+    <p><strong>URL:</strong> <a href="https://akshayjo1811.github.io/15-618-project/" target="_blank">https://akshayjo1811.github.io/15-618-project/</a></p>
+    
+    <h2>Summary</h2>
+    <p>We will develop a 2D heat diffusion simulation using finite difference methods, implement parallel versions using both shared address space and message passing programming models, and conduct a detailed performance analysis comparing their scalability, efficiency, and execution characteristics on multi-core CPU clusters available in the GHC lab.</p>
+    
+    <h2>Background</h2>
+    <p>Heat diffusion is a fundamental physical phenomenon described by the heat equation:</p>
+    <p>∂T/∂t = α(∂²T/∂x² + ∂²T/∂y²)</p>
+    <p>The finite difference method (FDM) is used to solve this equation numerically by discretizing the domain into a grid.</p>
+    
+    <h2>The Challenge</h2>
+    <p>Each grid point update depends on its neighbors, requiring communication at subdomain boundaries. This introduces synchronization overhead. We will explore both shared and distributed memory approaches and analyze tradeoffs in performance and accuracy.</p>
+    
+    <h2>Resources</h2>
+    <p>We will build the simulator from scratch but may adapt existing C/C++ models if useful. Research papers on heat diffusion will be referenced.</p>
+    
+    <h2>Goals and Deliverables</h2>
+    <ul>
+        <li>Implement a sequential 2D heat diffusion simulation.</li>
+        <li>Develop shared memory parallelization (OpenMP) and distributed memory parallelization (MPI).</li>
+        <li>Analyze communication overhead, scaling efficiency, and synchronization costs.</li>
+        <li>Explore a hybrid OpenMP+MPI approach.</li>
+    </ul>
+    
+    <h2>Platform Choice</h2>
+    <p>X86-64 multi-core CPU architecture with OpenMP & MPI libraries. Implementation in C/C++.</p>
+    
+    <h2>Rough Schedule</h2>
+    <ul>
+        <li><strong>Week 1:</strong> Setup, finalize approach, sequential implementation.</li>
+        <li><strong>Week 2:</strong> OpenMP implementation.</li>
+        <li><strong>Week 3:</strong> MPI implementation.</li>
+        <li><strong>Week 4:</strong> Hybrid MPI + OpenMP implementation and tradeoff analysis.</li>
+        <li><strong>Week 5:</strong> Benchmark testing and final report.</li>
+    </ul>
+</body>
+</html>
