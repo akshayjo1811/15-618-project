@@ -27,20 +27,22 @@
 
     <div class="section">
         <h2>Background</h2>
-        <p>Heat diffusion is a fundamental physical phenomenon described by the heat equation, a partial differential equation that models how temperature distributes over time in a medium: ∂T/∂t = α∇²T</p>
-        <p>Where T is temperature, t is time, α is the thermal diffusivity constant, and ∇² is the Laplacian operator. In two dimensions, this equation becomes: ∂T/∂t = α(∂²T/∂x² + ∂²T/∂y²)</p>
-        <p>To solve this equation numerically, the finite difference method (FDM) is commonly used. The domain is discretized into a grid, and the partial derivatives are approximated using difference equations. The explicit scheme for the 2D heat equation is: T(i,j)^(n+1) = T(i,j)^n + α∆t/∆x²[T(i+1,j)^n + T(i-1,j)^n + T(i,j+1)^n + T(i,j-1)^n - 4T(i,j)^n]</p>
+        <p>Heat diffusion is a fundamental physical phenomenon described by the heat equation, a partial differential equation that models how temperature distributes over time in a medium: </p>
+        <p>∂T/∂t = α∇²T</p>
+        <p>Where T is temperature, t is time, α is the thermal diffusivity constant, and ∇² is the Laplacian operator. In two dimensions, this equation becomes: </p>
+        <p>∂T/∂t = α(∂²T/∂x² + ∂²T/∂y²)</p>
+        <p>To solve this equation numerically, the finite difference method (FDM) is commonly used. The domain is discretized into a grid, and the partial derivatives are approximated using difference equations. The explicit scheme for the 2D heat equation is: </p>
+        <p>T(i,j)^(n+1) = T(i,j)^n + α∆t/∆x²[T(i+1,j)^n + T(i-1,j)^n + T(i,j+1)^n + T(i,j-1)^n - 4T(i,j)^n]</p>
         <p>Where i,j are spatial indices, n is the time step, ∆t is the time step size, and ∆x is the spatial step size.</p>
     </div>
 
     <div class="section">
-        <h2>This Computation is Parallelizable</h2>
-        <p>This computation is parallelizable because the temperature update at each grid point depends only on its previous value and its neighbors' previous values. The computation can be distributed across multiple processors by dividing the grid into subdomains, with each processor responsible for updating its assigned subdomain. The pseudocode may look something like this:</p>
+        <p>This computation is parallelizable because the temperature update at each grid point depends only on its previous value and its neighbors' previous values. The computation can be distributed across multiple processors by dividing the grid into subdomains, with each processor responsible for updating its assigned subdomain. The sequential pseudocode may look something like this:</p>
         <p>Initialize temperature grid with boundary conditions</p>
         <p>For each time step:</p>
-        <p>- For each grid point (i,j) in a group:</p>
-        <p>--- Calculate new temperature using the finite difference formula</p>
-        <p>--- Update grid with new temperatures</p>
+        <p>-- For each grid point (i,j) in a group:</p>
+        <p>---- Calculate new temperature using the finite difference formula</p>
+        <p>---- Update grid with new temperatures</p>
     </div>
 
     <div class="section">
