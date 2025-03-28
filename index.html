@@ -38,10 +38,9 @@
         <p>This computation is parallelizable because the temperature update at each grid point depends only on its previous value and its neighbors' previous values. The computation can be distributed across multiple processors by dividing the grid into subdomains, with each processor responsible for updating its assigned subdomain. The pseudocode may look something like this:</p>
         <p>Initialize temperature grid with boundary conditions</p>
         <p>For each time step:</p>
-        <p>a. For each grid point (i,j) in a group:</p>
-        <p>Calculate new temperature using the finite difference formula</p>
-        <p>Update grid with new temperatures</p>
-        <p>Update the grid after synching with the other processors.</p>
+        <p>- For each grid point (i,j) in a group:</p>
+        <p>--- Calculate new temperature using the finite difference formula</p>
+        <p>--- Update grid with new temperatures</p>
     </div>
 
     <div class="section">
