@@ -2,46 +2,85 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>15-618 Project Proposal: Parallel Simulation of Heat Diffusion</title>
+    <title>15-618 Parallel Heat Diffusion Simulation</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1, h2 { color: #2c3e50; }
+        .section { margin-bottom: 30px; }
+        ul { padding-left: 20px; }
+        code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; }
+    </style>
 </head>
 <body>
     <h1>15-618 Project Proposal: Parallel Simulation of Heat Diffusion</h1>
-    <p><strong>Group:</strong> Akshay Joshi (akshayjo) & Amogha Hegde (amoghah)</p>
-    <p><strong>URL:</strong> <a href="https://akshayjo1811.github.io/15-618-project/" target="_blank">https://akshayjo1811.github.io/15-618-project/</a></p>
     
-    <h2>Summary</h2>
-    <p>We will develop a 2D heat diffusion simulation using finite difference methods, implement parallel versions using both shared address space and message passing programming models, and conduct a detailed performance analysis comparing their scalability, efficiency, and execution characteristics on multi-core CPU clusters available in the GHC lab.</p>
-    
-    <h2>Background</h2>
-    <p>Heat diffusion is a fundamental physical phenomenon described by the heat equation:</p>
-    <p>∂T/∂t = α(∂²T/∂x² + ∂²T/∂y²)</p>
-    <p>The finite difference method (FDM) is used to solve this equation numerically by discretizing the domain into a grid.</p>
-    
-    <h2>The Challenge</h2>
-    <p>Each grid point update depends on its neighbors, requiring communication at subdomain boundaries. This introduces synchronization overhead. We will explore both shared and distributed memory approaches and analyze tradeoffs in performance and accuracy.</p>
-    
-    <h2>Resources</h2>
-    <p>We will build the simulator from scratch but may adapt existing C/C++ models if useful. Research papers on heat diffusion will be referenced.</p>
-    
-    <h2>Goals and Deliverables</h2>
-    <ul>
-        <li>Implement a sequential 2D heat diffusion simulation.</li>
-        <li>Develop shared memory parallelization (OpenMP) and distributed memory parallelization (MPI).</li>
-        <li>Analyze communication overhead, scaling efficiency, and synchronization costs.</li>
-        <li>Explore a hybrid OpenMP+MPI approach.</li>
-    </ul>
-    
-    <h2>Platform Choice</h2>
-    <p>X86-64 multi-core CPU architecture with OpenMP & MPI libraries. Implementation in C/C++.</p>
-    
-    <h2>Rough Schedule</h2>
-    <ul>
-        <li><strong>Week 1:</strong> Setup, finalize approach, sequential implementation.</li>
-        <li><strong>Week 2:</strong> OpenMP implementation.</li>
-        <li><strong>Week 3:</strong> MPI implementation.</li>
-        <li><strong>Week 4:</strong> Hybrid MPI + OpenMP implementation and tradeoff analysis.</li>
-        <li><strong>Week 5:</strong> Benchmark testing and final report.</li>
-    </ul>
+    <div class="section">
+        <h2>Group</h2>
+        <p>Akshay Joshi (akshayjo) & Amogha Hegde (amoghah)</p>
+        <p>URL: <a href="https://akshayjo1811.github.io/15-618-project/">https://akshayjo1811.github.io/15-618-project/</a></p>
+    </div>
+
+    <div class="section">
+        <h2>Summary</h2>
+        <p>We will develop a 2D heat diffusion simulation using finite difference methods, implement parallel versions using both shared address space and message passing programming models, and conduct a detailed performance analysis comparing their scalability, efficiency, and execution characteristics on multi-core CPU clusters available in the GHC lab.</p>
+    </div>
+
+    <div class="section">
+        <h2>Background</h2>
+        <p>Heat diffusion is a fundamental physical phenomenon described by the heat equation, a partial differential equation that models how temperature distributes over time in a medium: ∂T/∂t = α∇²T</p>
+        <p>Where T is temperature, t is time, α is the thermal diffusivity constant, and ∇² is the Laplacian operator. In two dimensions, this equation becomes: ∂T/∂t = α(∂²T/∂x² + ∂²T/∂y²)</p>
+        <p>To solve this equation numerically, the finite difference method (FDM) is commonly used. The domain is discretized into a grid, and the partial derivatives are approximated using difference equations. The explicit scheme for the 2D heat equation is: T(i,j)^(n+1) = T(i,j)^n + α∆t/∆x²[T(i+1,j)^n + T(i-1,j)^n + T(i,j+1)^n + T(i,j-1)^n - 4T(i,j)^n]</p>
+        <p>Where i,j are spatial indices, n is the time step, ∆t is the time step size, and ∆x is the spatial step size.</p>
+    </div>
+
+    <div class="section">
+        <h2>This Computation is Parallelizable</h2>
+        <p>This computation is parallelizable because the temperature update at each grid point depends only on its previous value and its neighbors' previous values. The computation can be distributed across multiple processors by dividing the grid into subdomains, with each processor responsible for updating its assigned subdomain. The pseudocode may look something like this:</p>
+        <p>Initialize temperature grid with boundary conditions</p>
+        <p>For each time step:</p>
+        <p>a. For each grid point (i,j) in a group:</p>
+        <p>Calculate new temperature using the finite difference formula</p>
+        <p>Update grid with new temperatures</p>
+        <p>Update the grid after synching with the other processors.</p>
+    </div>
+
+    <div class="section">
+        <h2>The Challenge</h2>
+        <p>While each grid point's update depends only on its neighbors, this creates communication requirements at subdomain boundaries. The main challenge here is the diffusion changes for each particle over time which means the particles in the grid do not have fixed locations, which has to be accounted for making the problem dynamic. These ghost regions must be exchanged between processors. Hence, communication/synchronization overhead will be introduced. Nonetheless, the algorithm exhibits good spatial locality since it accesses neighboring grid points, but the efficiency depends on how the domain is partitioned. For large problem sizes, the ratio of computation to communication is favorable. However, as we increase the number of processors, the subdomain size decreases, potentially increasing the relative communication overhead. Ensuring each processor has an equal amount of work is crucial for performance. Heat diffusion with uniform properties is naturally balanced, but non-uniform domain decomposition or irregular boundary conditions can create imbalances.</p>
+        <p>This has to be repeated in iteration with a scenario something like this. Let’s suppose we have ‘n’ processors and one processor is assigned to update 1000 cells totally, and in each iteration each processor works on let’s say 10 cells after which it has to get the updated matrix which has all the other 10 cells done by other processors to ensure better accuracy. This stage we will have to keep the matrix shared to have communication between processors or each one has to have the entire local copy and data has to be synced with them. We will try out both these approaches and compare the performance and accuracy and note the tradeoffs.</p>
+    </div>
+
+    <div class="section">
+        <h2>Resources</h2>
+        <p>The simulator will be built from scratch; nevertheless, if we happen to find a starter code in C/C++ that seems to model heat diffusion, we would utilize it and model it accordingly. Additionally, we are referring to online papers to understand heat distribution behavior.</p>
+    </div>
+
+    <div class="section">
+        <h2>Goals and Deliverables</h2>
+        <h3>Plan to Achieve:</h3>
+        <ul>
+            <li>Implement a sequential 2D heat diffusion simulation using the finite difference method with various boundary conditions.</li>
+            <li>Develop two parallel implementations - Shared memory parallelization using OpenMP and Distributed memory parallelization using MPI.</li>
+            <li>Conduct a comprehensive performance analysis based on communication overhead, scaling efficiency, synchronization overhead, workload balance.</li>
+        </ul>
+        <h3>Hope to Achieve:</h3>
+        <p>Implement a hybrid OpenMP+MPI approach and compare its performance with the pure OpenMP and pure MPI.</p>
+    </div>
+
+    <div class="section">
+        <h2>Platform Choice</h2>
+        <p>X86-64 multi-core CPU architecture with support for OpenMP & MPI libraries; source code in C/C++</p>
+    </div>
+
+    <div class="section">
+        <h2>Rough Schedule</h2>
+        <ul>
+            <li><strong>Week 1:</strong> Setup, approach design finalize and sequential implementation</li>
+            <li><strong>Week 2:</strong> OpenMP implementation</li>
+            <li><strong>Week 3:</strong> MPI implementation</li>
+            <li><strong>Week 4:</strong> Hybrid implementation of MPI and OpenMP and analyzing tradeoffs between them</li>
+            <li><strong>Week 5:</strong> Benchmark testing and final report</li>
+        </ul>
+    </div>
 </body>
 </html>
